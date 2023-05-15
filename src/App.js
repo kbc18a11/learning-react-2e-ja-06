@@ -1,45 +1,34 @@
-import React, { useState } from "react";
-import colorData from "./color-data.json";
-import ColorList from "./ColorList.js";
-import AddColorForm from "./AddColorForm";
-import { v4 } from "uuid";
+import React, { useState, useEffect } from "react";
 
-export default function App() {
-  const [colors, setColors] = useState(colorData);
+const useAnyKeyToRender = () => {
+  const [, forceRender] = useState();
 
-  const removeColor = id => {
-    const newColors = colors.filter(color => color.id !== id);
-    setColors(newColors);
-  };
+  useEffect(() => {
+    window.addEventListener("keydown", forceRender);
+    return () => window.removeEventListener("keydown", forceRender);
+  }, []);
+};
 
-  const rateColor = (id, rating) => {
-    const newColors = colors.map(color =>
-      color.id === id ? { ...color, rating } : color
-    );
-    setColors(newColors);
-  };
+function WordCount({ children = "" }) {
+  useAnyKeyToRender();
 
-  const createColor = (title, color) => {
-    const newColors = [
-      ...colors,
-      {
-        id: v4(),
-        rating: 0,
-        title,
-        color
-      }
-    ];
-    setColors(newColors);
-  };
+  // 毎回異なるインスタンスが生成される
+  const words = ["a", "b", "c"];
+
+  useEffect(() => {
+    console.log("fresh render");
+  }, [words]);
 
   return (
     <>
-      <AddColorForm onNewColor={createColor} />
-      <ColorList
-        colors={colors}
-        onRemoveColor={removeColor}
-        onRateColor={rateColor}
-      />
+      <p>{children}</p>
+      <p>
+        <strong>{words.length} - words</strong>
+      </p>
     </>
   );
+}
+
+export default function App() {
+  return <WordCount>You are not going to believe this but...</WordCount>;
 }
