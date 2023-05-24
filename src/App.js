@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 const useAnyKeyToRender = () => {
   const [, forceRender] = useState();
@@ -12,21 +12,18 @@ const useAnyKeyToRender = () => {
 function WordCount({ children = "" }) {
   useAnyKeyToRender();
 
-  // 毎回異なるインスタンスが生成される
-  const words = ["a", "b", "c"];
+  // useCallbackによるメモ化
+  const fn = useCallback(() => {
+    console.log("hello");
+    console.log("world");
+  }, []);
 
   useEffect(() => {
     console.log("fresh render");
-  }, [words]);
+    fn();
+  }, [fn]);
 
-  return (
-    <>
-      <p>{children}</p>
-      <p>
-        <strong>{words.length} - words</strong>
-      </p>
-    </>
-  );
+  return <p>{children}</p>;
 }
 
 export default function App() {
